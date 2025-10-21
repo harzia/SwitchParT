@@ -458,21 +458,25 @@ class Block(nn.Module):
         return x
     
 class SwitchHeadBlock(nn.Module):
-    def __init__(self, embed_dim=128, num_heads=8, ffn_ratio=4, num_experts=4, active_experts=2,
+    def __init__(self, embed_dim=128, num_heads=8, head_dim=None, ffn_ratio=4, num_experts=4, active_experts=2,
                  dropout=0.1, attn_dropout=0.1, activation_dropout=0.1,
                  add_bias_kv=False, activation='gelu',
                  scale_fc=True, scale_attn=True, scale_heads=True, scale_resids=True):
         super().__init__()
-
+        
         self.embed_dim = embed_dim
         self.num_heads = num_heads
-        self.head_dim = embed_dim // num_heads
+        if head_dim is None:
+            self.head_dim = embed_dim // num_heads
+        else:
+            self.head_dim = head_dim
         self.ffn_dim = embed_dim * ffn_ratio
 
         self.pre_attn_norm = nn.LayerNorm(embed_dim)
         self.attn = SwitchHead(
             d_model=embed_dim,
             n_heads=num_heads,
+            d_head=head_dim,
             n_experts=num_experts,
             moe_k=active_experts,
             dropout=attn_dropout
@@ -562,6 +566,7 @@ class SwitchHeadParticleTransformer(nn.Module):
                  embed_dims=[128, 512, 128],
                  pair_embed_dims=[64, 64, 64],
                  num_heads=8,
+                 head_dim=None, # only for switchhead
                  num_experts=4,
                  active_experts=2,
                  num_cls_experts=4,
@@ -597,7 +602,7 @@ class SwitchHeadParticleTransformer(nn.Module):
         _logger.info('cfg_block: %s' % str(cfg_block))
 
         cfg_switch_block = copy.deepcopy(cfg_block)
-        cfg_switch_block.update(dict(num_experts=num_experts, active_experts=active_experts))
+        cfg_switch_block.update(dict(head_dim=head_dim, num_experts=num_experts, active_experts=active_experts))
 
         cfg_cls_block = copy.deepcopy(default_cfg)
         if cls_block_params is not None:
@@ -605,7 +610,7 @@ class SwitchHeadParticleTransformer(nn.Module):
         _logger.info('cfg_cls_block: %s' % str(cfg_cls_block))
 
         cfg_cls_switch_block = copy.deepcopy(cfg_cls_block)
-        cfg_cls_switch_block.update(dict(num_experts=num_cls_experts, active_experts=active_cls_experts))
+        cfg_cls_switch_block.update(dict(head_dim=head_dim, num_experts=num_cls_experts, active_experts=active_cls_experts))
 
         self.pair_extra_dim = pair_extra_dim
         self.embed = Embed(input_dim, embed_dims, activation=activation) if len(embed_dims) > 0 else nn.Identity()

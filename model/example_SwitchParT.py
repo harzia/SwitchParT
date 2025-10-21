@@ -26,6 +26,7 @@ def get_model(data_config, **kwargs):
         embed_dims=[128, 512, 128],
         pair_embed_dims=[64, 64, 64],
         num_heads=2,
+        head_dim=None,
         num_experts=4,
         active_experts=2,
         num_cls_experts=4,

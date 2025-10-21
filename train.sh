@@ -17,6 +17,7 @@ source env.sh
 echo "args: $@"
 
 NUM_HEADS=2
+HEAD_DIM=""
 PARTICLE_SWITCHHEAD=True
 CLASS_SWITCHHEAD=True
 NUM_EXPERTS=4
@@ -36,6 +37,7 @@ WEAVER_ARGS=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --num-heads) NUM_HEADS="$2"; shift 2 ;;
+        --head-dim) HEAD_DIM="$2"; shift 2 ;;
         --particle-switchhead) PARTICLE_SWITCHHEAD="$2"; shift 2 ;;
         --class-switchhead) CLASS_SWITCHHEAD="$2"; shift 2 ;;
         --num-experts) NUM_EXPERTS="$2"; shift 2 ;;
@@ -55,6 +57,9 @@ NETWORK_OPTIONS+=" --network-option num_experts ${NUM_EXPERTS}"
 NETWORK_OPTIONS+=" --network-option active_experts ${ACTIVE_EXPERTS}"
 NETWORK_OPTIONS+=" --network-option num_cls_experts ${NUM_CLS_EXPERTS}"
 NETWORK_OPTIONS+=" --network-option active_cls_experts ${ACTIVE_CLS_EXPERTS}"
+if [[ -n "${HEAD_DIM}" ]]; then
+    NETWORK_OPTIONS+=" --network-option head_dim ${HEAD_DIM}"
+fi
 
 suffix=${COMMENT}
 NGPUS=${DDP_NGPUS:-1}
