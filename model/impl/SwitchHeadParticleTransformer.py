@@ -491,7 +491,8 @@ class SwitchHeadBlock(nn.Module):
         self.post_fc_norm = nn.LayerNorm(self.ffn_dim) if scale_fc else None
         self.fc2 = nn.Linear(self.ffn_dim, embed_dim)
 
-        self.c_attn = nn.Parameter(torch.ones(num_heads), requires_grad=True) if scale_heads else None
+        #self.c_attn = nn.Parameter(torch.ones(num_heads), requires_grad=True) if scale_heads else None
+        self.c_attn = None # remove head scaling for switchhead, moe output projection is enough
         self.w_resid = nn.Parameter(torch.ones(embed_dim), requires_grad=True) if scale_resids else None
 
     def forward(self, x, x_cls=None, padding_mask=None, attn_mask=None):
