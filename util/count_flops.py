@@ -4,6 +4,12 @@ import torch
 
 from fvcore.nn import FlopCountAnalysis, flop_count_str
 
+from .flop_handles import (
+    baddbmm_flop_jit,
+    scaled_dot_product_attention_flop_jit,
+    cvmm_flop_counter
+)
+
 from model.impl.SwitchHeadParticleTransformer import SwitchHeadParticleTransformer
 
 
@@ -66,6 +72,11 @@ if __name__ == '__main__':
 
     try:
         flop_analyzer = FlopCountAnalysis(model, inputs_tuple)
+        flop_analyzer.set_op_handle("aten::baddbmm", baddbmm_flop_jit,
+                                    "aten::scaled_dot_product_attention", scaled_dot_product_attention_flop_jit,
+                                    "prim::PythonOp.CVMM", cvmm_flop_counter(args.num_heads, args.active_experts,
+                                                                             args.active_cls_experts, len(model.blocks)))
+    
         
         total_flops = flop_analyzer.total()
         unsupported_ops = flop_analyzer.unsupported_ops()
