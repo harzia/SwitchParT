@@ -65,7 +65,7 @@ suffix=${COMMENT}
 NGPUS=${DDP_NGPUS:-1}
 
 if ((NGPUS > 1)); then
-    CMD="torchrun --standalone --nnodes=1 --nproc_per_node=$NGPUS $(which weaver) --backend nccl"
+    CMD="torchrun --standalone --nnodes=1 --nproc_per_node=$NGPUS -- $(which weaver) --backend nccl"
 else
     CMD="weaver"
 fi
