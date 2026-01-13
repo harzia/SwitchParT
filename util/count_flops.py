@@ -48,7 +48,7 @@ if __name__ == '__main__':
         fc_params=[],
         activation='gelu',
         trim=True,
-        for_inference=True
+        for_inference=False
     )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
