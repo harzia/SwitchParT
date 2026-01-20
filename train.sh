@@ -84,6 +84,8 @@ fi
 
 mkdir -p "${OUTPUT_VOL_DIR}/training" "${OUTPUT_VOL_DIR}/logs" "${OUTPUT_VOL_DIR}/tensorboard" "${OUTPUT_VOL_DIR}/results"
 
+ln -sfn "${OUTPUT_VOL_DIR}/tensorboard" runs
+
 END_INDEX=$((TRAIN_PERCENTAGE - 1))
 
 expand_files() {
@@ -125,5 +127,5 @@ $CMD \
     --samples-per-epoch ${samples_per_epoch} --samples-per-epoch-val ${samples_per_epoch_val} --num-epochs $epochs --gpus 0 \
     --optimizer ranger --log ${OUTPUT_VOL_DIR}/logs/JetClass_Pythia_${FEATURE_TYPE}_SwitchParT_{auto}${suffix}.log \
     --predict-output ${OUTPUT_VOL_DIR}/results/JetClass_Pythia_${FEATURE_TYPE}_SwitchParT${suffix}/pred.root \
-    --tensorboard ${OUTPUT_VOL_DIR}/tensorboard/JetClass_Pythia_${FEATURE_TYPE}_SwitchParT${suffix} \
+    --tensorboard JetClass_Pythia_${FEATURE_TYPE}_SwitchParT${suffix} \
     "${WEAVER_ARGS[@]}"
